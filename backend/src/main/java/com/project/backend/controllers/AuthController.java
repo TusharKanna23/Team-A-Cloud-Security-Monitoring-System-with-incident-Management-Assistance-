@@ -2,6 +2,8 @@ package com.project.backend.controllers;
 
 import com.project.backend.dtos.AuthDtos.*;
 import com.project.backend.services.AuthService;
+
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,21 +18,39 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(
+            @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<AuthResponse> login(
+            @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest) {
+
+        String sourceIp = httpRequest.getRemoteAddr();
+
+        return ResponseEntity.ok(
+                authService.login(request, sourceIp));
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<AuthResponse> verifyOtp(@RequestBody VerifyOtpRequest request) {
-        return ResponseEntity.ok(authService.verifyOtp(request));
-    }@PostMapping("/resend-otp")
-public ResponseEntity<AuthResponse> resendOtp(@RequestBody java.util.Map<String, String> request) {
-    String email = request.get("email");
-    return ResponseEntity.ok(authService.resendOtp(email));
-}
+    public ResponseEntity<AuthResponse> verifyOtp(
+            @RequestBody VerifyOtpRequest request,
+            HttpServletRequest httpRequest) {
+
+        String sourceIp = httpRequest.getRemoteAddr();
+
+        return ResponseEntity.ok(
+                authService.verifyOtp(request, sourceIp));
+    }
+
+    @PostMapping("/resend-otp")
+    public ResponseEntity<AuthResponse> resendOtp(
+            @RequestBody java.util.Map<String, String> request) {
+
+        String email = request.get("email");
+
+        return ResponseEntity.ok(authService.resendOtp(email));
+    }
 }
